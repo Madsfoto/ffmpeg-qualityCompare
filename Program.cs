@@ -28,39 +28,39 @@ namespace ffmpeg_qualityCompare
                 foreach (var line in lines)
                 {
                     
-                    if(line.Contains("Parsed_identity_0"))
+                    if(line.Contains("Parsed_identity_0")) // Not representative for comparason, eg says lossless copies are not lossless
                         {
-                        string averageIdentity = "";
-                        float averageIdentityFloat = 0;
-                        string Filename_and_fpsStr = "";
-                        numberOfTxt++;
-                        if(line.Contains("R:1.000000")||line.Contains("Y:1.000000")) //[Parsed_identity_0 @ 00000230bde83b00] identity R:1.000000 G:1.000000 B:1.000000 A:1.000000 average:1.000000 min:1.000000 max:1.000000
-                        {
-                            averageIdentityFloat = 100;
+                    //    string averageIdentity = "";
+                    //    float averageIdentityFloat = 0;
+                    //    string Filename_and_fpsStr = "";
+                    //    numberOfTxt++;
+                    //    if(line.Contains("R:1.000000")||line.Contains("Y:1.000000")) //[Parsed_identity_0 @ 00000230bde83b00] identity R:1.000000 G:1.000000 B:1.000000 A:1.000000 average:1.000000 min:1.000000 max:1.000000
+                    //    {
+                    //        averageIdentityFloat = 100;
 
-                        }
-                        else
-                        {
-                            //[Parsed_identity_0 @ 000001f2c5698ec0] identity R:0.811168 G:0.808556 B:0.800074 average:0.806599 min:0.777498 max:0.946851
-                            //[Parsed_identity_0 @ 000001d5e6768440] identity Y:0.821730 U:0.817917 V:0.816431 average:0.818693 min:0.798308 max:0.850809
+                    //    }
+                    //    else
+                    //    {
+                    //        //[Parsed_identity_0 @ 000001f2c5698ec0] identity R:0.811168 G:0.808556 B:0.800074 average:0.806599 min:0.777498 max:0.946851
+                    //        //[Parsed_identity_0 @ 000001d5e6768440] identity Y:0.821730 U:0.817917 V:0.816431 average:0.818693 min:0.798308 max:0.850809
 
-                            //Console.WriteLine(line.IndexOf("average:")+8);
+                    //        //Console.WriteLine(line.IndexOf("average:")+8);
                             
-                            if(line.Contains("average:"))
-                            {
-                                averageIdentity = line.Substring(line.IndexOf("average:") + 8, 8);
-                                averageIdentityFloat = float.Parse(averageIdentity); // the number without the dot
-                                averageIdentityFloat = averageIdentityFloat / 10000;
-                            }
+                    //        if(line.Contains("average:"))
+                    //        {
+                    //            averageIdentity = line.Substring(line.IndexOf("average:") + 8, 8);
+                    //            averageIdentityFloat = float.Parse(averageIdentity); // the number without the dot
+                    //            averageIdentityFloat = averageIdentityFloat / 10000;
+                    //        }
                             
                             
-                        }
+                    //    }
 
-                        Filename_and_fpsStr = CorrectFilename + ";" + averageIdentityFloat;
+                    //    Filename_and_fpsStr = CorrectFilename + ";" + averageIdentityFloat;
                         
-                        average = average + averageIdentityFloat;
+                    //    average = average + averageIdentityFloat;
                         
-                        Filenames_and_quality.Add(Filename_and_fpsStr);
+                    //    Filenames_and_quality.Add(Filename_and_fpsStr);
                         
                     }
                     if(line.Contains("VMAF score"))
