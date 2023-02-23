@@ -68,12 +68,21 @@ namespace ffmpeg_qualityCompare
        
             if (everyFile == true)
             {
-                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mov"))
+                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(),"*.mov"))
                 {
                     ffmpegBatList.AddRange(createBatContentList(modifiedFileFromDir, referenceFile));
 
-                } // last loop
+                }
+                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mp4"))
+                {
+                    ffmpegBatList.AddRange(createBatContentList(modifiedFileFromDir, referenceFile));
 
+                }
+                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mkv"))
+                {
+                    ffmpegBatList.AddRange(createBatContentList(modifiedFileFromDir, referenceFile));
+
+                }
             }
             else
             {
