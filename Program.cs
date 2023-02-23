@@ -25,6 +25,11 @@ namespace ffmpeg_qualityCompare
             string referenceWithExtention = referenceFile.Substring(referenceFile.LastIndexOf("\\") + 1);
             string referenceCorrect = referenceWithExtention.Substring(0, referenceWithExtention.Length - 4);
 
+            if(modifiedCorrect==referenceCorrect)
+            {
+                return batList;
+            }
+
             string[] algoArr = { "ssim", "psnr", "identity", "vif", "libvmaf", "msad" };
 
             for (int algoInt = 0; algoInt < algoArr.Length; algoInt++)
