@@ -179,14 +179,17 @@ namespace ffmpeg_qualityCompare
 
                 double actualValue = 0;
                 string Filename_and_fpsStr = "";
-                if (line.Contains("average:0.000000")) //[Parsed_msad_0 @ 000002c8a7b03700] msad R:0.000000 G:0.000000 B:0.000000 A:0.000000 average:0.000000 min:0.000000 max:0.000000
+                if (line.Contains("average:0.000000")) 
+                    //[Parsed_msad_0 @ 000002c8a7b03700] msad R:0.000000 G:0.000000 B:0.000000 A:0.000000 average:0.000000 min:0.000000 max:0.000000
                 {
                     actualValue = 100;
                 }
-                else //[Parsed_msad_0 @ 000001fa5e6a8ec0] msad R:0.007541 G:0.008110 B:0.007207 average:0.007620 min:0.001948 max:0.012130
+                else 
+                    //[Parsed_msad_0 @ 000001fa5e6a8ec0] msad R:0.007541 G:0.008110 B:0.007207 average:0.007620 min:0.001948 max:0.012130
+                    //[Parsed_msad_0 @ 0000019b13874d00] msad Y:0.002856 U: 0.002033 V: 0.001891 average: 0.002260 min: 0.001464 max: 0.002713
                 {
                     string ParseResult = line.Substring(line.IndexOf("average:") + 8, 8);
-                    ParseResult = resultStr.Replace(".", ",");
+                    ParseResult = ParseResult.Replace(".", ",");
                     actualValue = 100 - double.Parse(ParseResult);
 
                 }
