@@ -30,7 +30,7 @@ namespace ffmpeg_qualityCompare
                 return batList;
             }
 
-            string[] algoArr = { "ssim", "psnr", "identity", "vif", "libvmaf", "msad" };
+            string[] algoArr = { "ssim", "psnr", "identity", "vif", "libvmaf", "msad", "corr" };
 
             for (int algoInt = 0; algoInt < algoArr.Length; algoInt++)
             {
