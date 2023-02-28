@@ -12,11 +12,11 @@ namespace ffmpeg_qualityCompare
         static double vifScore = 0;
 
         static string compareBatFilename = "0-compare.bat";
-        
+
         static List<string> createBatContentList(string modifiedFile, string referenceFile)
         {
             List<string> batList = new List<string>();
-            
+
             string modifiedNoExt = modifiedFile.Substring(0, (modifiedFile.Length - 4));
             string modifiedWithExtension = modifiedFile.Substring(modifiedFile.LastIndexOf("\\") + 1);
             string modifiedCorrect = modifiedWithExtension.Substring(0, modifiedWithExtension.Length - 4);
@@ -25,7 +25,7 @@ namespace ffmpeg_qualityCompare
             string referenceWithExtension = referenceFile.Substring(referenceFile.LastIndexOf("\\") + 1);
             string referenceCorrect = referenceWithExtension.Substring(0, referenceWithExtension.Length - 4);
 
-            if(modifiedCorrect==referenceCorrect)
+            if (modifiedCorrect == referenceCorrect)
             {
                 return batList;
             }
@@ -34,7 +34,7 @@ namespace ffmpeg_qualityCompare
 
             for (int algoInt = 0; algoInt < algoArr.Length; algoInt++)
             {
-                string ffStr = "ffmpeg -i " +"\"" +modifiedWithExtension + "\"" + " -i "  +"\"" +referenceWithExtension + "\"" + " -lavfi " + algoArr[algoInt];
+                string ffStr = "ffmpeg -i " + "\"" + modifiedWithExtension + "\"" + " -i " + "\"" + referenceWithExtension + "\"" + " -lavfi " + algoArr[algoInt];
                 string txtStr = " -f null - 2> " + "\"" + modifiedCorrect + "_" + referenceCorrect + ";" + algoArr[algoInt] + ".txt" + "\"";
 
                 if (algoArr[algoInt] == "libvmaf")
@@ -57,7 +57,7 @@ namespace ffmpeg_qualityCompare
         }
         static void filegen(string modifiedFile, string referenceFile, bool everyFile)
         {
-            
+
 
             // This will output a .bat file that compares the ground gruth files to the generated files from ffmpeg and swrescale.
 
@@ -68,12 +68,12 @@ namespace ffmpeg_qualityCompare
             //ffmpeg -i main.mpg -i ref.mpg -lavfi libvmaf -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi msad -f null -
 
-            
+
             List<string> ffmpegBatList = new List<string>();
-       
+
             if (everyFile == true)
             {
-                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(),"*.mov"))
+                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mov"))
                 {
                     ffmpegBatList.AddRange(createBatContentList(modifiedFileFromDir, referenceFile));
 
@@ -184,14 +184,14 @@ namespace ffmpeg_qualityCompare
 
                 double actualValue = 0;
                 string Filename_and_fpsStr = "";
-                if (line.Contains("average:0.000000")) 
-                    //[Parsed_msad_0 @ 000002c8a7b03700] msad R:0.000000 G:0.000000 B:0.000000 A:0.000000 average:0.000000 min:0.000000 max:0.000000
+                if (line.Contains("average:0.000000"))
+                //[Parsed_msad_0 @ 000002c8a7b03700] msad R:0.000000 G:0.000000 B:0.000000 A:0.000000 average:0.000000 min:0.000000 max:0.000000
                 {
                     actualValue = 100;
                 }
-                else 
-                    //[Parsed_msad_0 @ 000001fa5e6a8ec0] msad R:0.007541 G:0.008110 B:0.007207 average:0.007620 min:0.001948 max:0.012130
-                    //[Parsed_msad_0 @ 0000019b13874d00] msad Y:0.002856 U: 0.002033 V: 0.001891 average: 0.002260 min: 0.001464 max: 0.002713
+                else
+                //[Parsed_msad_0 @ 000001fa5e6a8ec0] msad R:0.007541 G:0.008110 B:0.007207 average:0.007620 min:0.001948 max:0.012130
+                //[Parsed_msad_0 @ 0000019b13874d00] msad Y:0.002856 U: 0.002033 V: 0.001891 average: 0.002260 min: 0.001464 max: 0.002713
                 {
                     string ParseResult = line.Substring(line.IndexOf("average:") + 8, 8);
                     ParseResult = ParseResult.Replace(".", ",");
@@ -337,11 +337,11 @@ namespace ffmpeg_qualityCompare
                 string referenceFileCMD = Console.ReadLine();
                 if (referenceFileCMD.Length == 0)
                 {
-                    filegen("MODIFIED","REFERENCE", false);
+                    filegen("MODIFIED", "REFERENCE", false);
                 }
-                if (referenceFileCMD.Length <4)
+                if (referenceFileCMD.Length < 4)
                 {
-                    Console.WriteLine("REFERENCE must have a full extention, eg .mov");
+                    Console.WriteLine("REFERENCE must have a full extension, eg .mov");
                     return;
                 }
                 else
@@ -349,27 +349,27 @@ namespace ffmpeg_qualityCompare
                     Console.WriteLine("Do you want to compare against every mov|mp4|mkv file in the current directory? Y/N and Return");
                     if (Console.ReadLine() == "y")
                     {
-                        filegen("",referenceFileCMD, true) ;
+                        filegen("", referenceFileCMD, true);
                     }
                     else
                     {
                         Console.WriteLine("Write MODIFIED filename");
                         String modifiedFileCMD = Console.ReadLine();
-                        if(modifiedFileCMD.Length == 0) 
+                        if (modifiedFileCMD.Length == 0)
                         {
                             Console.WriteLine("MODIFIED can not be empty");
                             return;
                         }
-                        else if(modifiedFileCMD.Length <4)
+                        else if (modifiedFileCMD.Length < 4)
                         {
-                            Console.WriteLine("MODIFIED must have a full extention, eg .mov");
+                            Console.WriteLine("MODIFIED must have a full extension, eg .mov");
                             return;
                         }
                         else
                         {
                             filegen(modifiedFileCMD, referenceFileCMD, false);
                         }
-                        
+
                     }
 
                 }
@@ -377,12 +377,14 @@ namespace ffmpeg_qualityCompare
             }
 
 
-            Console.WriteLine("Want to execute the batfile? Y/N with enter");
-            if(Console.ReadLine() == "y")
+            Console.WriteLine("Want to execute the .bat file? Y/N with enter");
+            if (Console.ReadLine() == "y")
             {
                 Process.Start(compareBatFilename);
+
+
                 // wait for the processing to stop before moving forward
-                
+
             }
             else
             {
@@ -396,10 +398,10 @@ namespace ffmpeg_qualityCompare
             }
             else
             {
-                
+
             }
 
-            
+
 
 
         }
