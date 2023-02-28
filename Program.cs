@@ -35,7 +35,7 @@ namespace ffmpeg_qualityCompare
             for (int algoInt = 0; algoInt < algoArr.Length; algoInt++)
             {
                 string ffStr = "ffmpeg -i " + "\"" + modifiedWithExtension + "\"" + " -i " + "\"" + referenceWithExtension + "\"" + " -lavfi " + algoArr[algoInt];
-                string txtStr = " -f null - 2> " + "\"" + modifiedCorrect + "_" + referenceCorrect + ";" + algoArr[algoInt] + ".txt" + "\"";
+                string txtStr = " -f null - 2> " + "\"" + modifiedCorrect + "_" + referenceCorrect + "_" + algoArr[algoInt] + ".txt" + "\"";
 
                 if (algoArr[algoInt] == "libvmaf")
                 {
@@ -380,7 +380,11 @@ namespace ffmpeg_qualityCompare
             Console.WriteLine("Want to execute the .bat file? Y/N with enter");
             if (Console.ReadLine() == "y")
             {
-                Process.Start(compareBatFilename);
+                Process p = new Process();
+                p.StartInfo.FileName = compareBatFilename;
+                p.Start();
+                p.WaitForExit();
+                
 
 
                 // wait for the processing to stop before moving forward
