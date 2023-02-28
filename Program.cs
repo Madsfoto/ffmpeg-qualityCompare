@@ -11,19 +11,19 @@ namespace ffmpeg_qualityCompare
         static double average = 0;
         static double vifScore = 0;
 
-        static string comparebatfilename = "0-compare.bat";
+        static string compareBatFilename = "0-compare.bat";
         
         static List<string> createBatContentList(string modifiedFile, string referenceFile)
         {
             List<string> batList = new List<string>();
             
             string modifiedNoExt = modifiedFile.Substring(0, (modifiedFile.Length - 4));
-            string modifiedWithExtention = modifiedFile.Substring(modifiedFile.LastIndexOf("\\") + 1);
-            string modifiedCorrect = modifiedWithExtention.Substring(0, modifiedWithExtention.Length - 4);
+            string modifiedWithExtension = modifiedFile.Substring(modifiedFile.LastIndexOf("\\") + 1);
+            string modifiedCorrect = modifiedWithExtension.Substring(0, modifiedWithExtension.Length - 4);
 
             string referenceNoExt = referenceFile.Substring(0, (referenceFile.Length - 4));
-            string referenceWithExtention = referenceFile.Substring(referenceFile.LastIndexOf("\\") + 1);
-            string referenceCorrect = referenceWithExtention.Substring(0, referenceWithExtention.Length - 4);
+            string referenceWithExtension = referenceFile.Substring(referenceFile.LastIndexOf("\\") + 1);
+            string referenceCorrect = referenceWithExtension.Substring(0, referenceWithExtension.Length - 4);
 
             if(modifiedCorrect==referenceCorrect)
             {
@@ -34,7 +34,7 @@ namespace ffmpeg_qualityCompare
 
             for (int algoInt = 0; algoInt < algoArr.Length; algoInt++)
             {
-                string ffStr = "ffmpeg -i " +"\"" +modifiedWithExtention + "\"" + " -i "  +"\"" +referenceWithExtention + "\"" + " -lavfi " + algoArr[algoInt];
+                string ffStr = "ffmpeg -i " +"\"" +modifiedWithExtension + "\"" + " -i "  +"\"" +referenceWithExtension + "\"" + " -lavfi " + algoArr[algoInt];
                 string txtStr = " -f null - 2> " + "\"" + modifiedCorrect + "_" + referenceCorrect + ";" + algoArr[algoInt] + ".txt" + "\"";
 
                 if (algoArr[algoInt] == "libvmaf")
@@ -96,7 +96,7 @@ namespace ffmpeg_qualityCompare
             }
 
 
-            File.WriteAllLines(comparebatfilename, ffmpegBatList);
+            File.WriteAllLines(compareBatFilename, ffmpegBatList);
 
         }
 
@@ -380,12 +380,13 @@ namespace ffmpeg_qualityCompare
             Console.WriteLine("Want to execute the batfile? Y/N with enter");
             if(Console.ReadLine() == "y")
             {
-                Process.Start(comparebatfilename);
+                Process.Start(compareBatFilename);
+                // wait for the processing to stop before moving forward
                 
             }
             else
             {
-                
+                return;
             }
 
             Console.WriteLine("Want to calculate the average scores? Y/N with enter");
