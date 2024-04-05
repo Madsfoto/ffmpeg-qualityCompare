@@ -318,7 +318,7 @@ namespace ffmpeg_qualityCompare
 
 
             }
-            else
+            else // corr, identity
             {
 
             }
