@@ -30,7 +30,8 @@ namespace ffmpeg_qualityCompare
                 return batList;
             }
 
-            string[] algoArr = { "ssim", "psnr", "identity", "vif", "libvmaf", "msad", "corr" };
+            //string[] algoArr = { "ssim", "psnr", "identity", "vif", "libvmaf", "msad", "corr" }; // Every option ffmpeg has. 
+            string[] algoArr = { "ssim", "psnr", "vif", "msad", "corr" }; // The relevant ones that is built in.
 
             for (int algoInt = 0; algoInt < algoArr.Length; algoInt++)
             {
@@ -67,6 +68,7 @@ namespace ffmpeg_qualityCompare
             //ffmpeg -i main.mpg -i ref.mpg -lavfi vif -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi libvmaf -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi msad -f null -
+            //ffmpeg -i main.mpg -i ref.mpg -lavfi corr -f null -
 
 
             List<string> ffmpegBatList = new List<string>();
@@ -109,15 +111,16 @@ namespace ffmpeg_qualityCompare
             foreach (var file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.txt"))
             {
                 string FilenameWithExtention = file.Substring(file.LastIndexOf("\\") + 1);
-                string CorrectFilename = FilenameWithExtention.Substring(0, FilenameWithExtention.Length - 4);
+                string FileNameNoExt = FilenameWithExtention.Substring(0, FilenameWithExtention.Length - 4);
                 var lines = File.ReadLines(file);
 
                 foreach (var line in lines)
                 {
                     if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
-                        || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale="))
+                        || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
+                        // Leftover from all the algorithms. Does no harm to check for the things that are disabled, Dotnet is fast enough to not make a difference
                     {
-                        string resultStr = ReadResult(line, CorrectFilename);
+                        string resultStr = ReadResult(line, FileNameNoExt);
                         if (resultStr.Length > 0)
                         {
                             Filenames_and_quality.Add(resultStr);
@@ -318,7 +321,53 @@ namespace ffmpeg_qualityCompare
 
 
             }
-            else // corr, identity
+            else if (line.Contains("Parsed_corr_0"))
+            {
+
+                double resultDouble = 0;
+                string Filename_and_fpsStr = "";
+
+                //[Parsed_corr_0 @ 000002885d5fe9c0] corr Y:1.000000 U:1.000000 V:1.000000 average:1.000000 min:1.000000 max:1.000000
+
+                resultDouble = double.Parse(line.Substring(line.IndexOf("average:") + 8, 8).Replace(".", ",")) * 100;
+
+
+                
+                Filename_and_fpsStr = filename + ";" + resultDouble;
+                average = average + resultDouble;
+
+
+                resultStr = Filename_and_fpsStr;
+
+
+            }
+            //else if (line.Contains("Parsed_identity_0"))  // Identity works perfectly as code. as of 6 april 2024)
+            // HOWEVER!
+            // The Identity algorithm extensively punishes difference and as such will skew any results far downwards. 
+            // As an exmaple: Visually identical videos (h264 high 4:2:2 L6.0, yuv422p10le, 2560x1440, QP24 vs QP0):
+            // corr;99,9952. msad;99,999113. psnr;100. ssim;99,8938. vif;96,4355235294118. Identity: 41,4281. 
+            // I can not stress enough how massive that difference is in Identity compared to the rest. 
+            // As such I have disabled it, but left it as a possibility for the next user to re-enable
+            //{
+
+            //    double resultDouble = 0;
+            //    string Filename_and_fpsStr = "";
+
+            //    //[Parsed_corr_0 @ 000002885d5fe9c0] corr Y:1.000000 U:1.000000 V:1.000000 average:1.000000 min:1.000000 max:1.000000
+
+            //    resultDouble = double.Parse(line.Substring(line.IndexOf("average:") + 8, 8).Replace(".", ",")) * 100;
+
+
+
+            //    Filename_and_fpsStr = filename + ";" + resultDouble;
+            //    average = average + resultDouble;
+
+
+            //    resultStr = Filename_and_fpsStr;
+
+
+            //}
+            else
             {
 
             }
@@ -400,6 +449,7 @@ namespace ffmpeg_qualityCompare
             {
                 WriteResult();
             }
+
             else
             {
 
