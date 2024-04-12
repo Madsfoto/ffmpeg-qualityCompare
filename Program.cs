@@ -376,9 +376,15 @@ namespace ffmpeg_qualityCompare
 
         static void Main(string[] args)
         {
+            if (args[0] =="avg")
+            {
+                // Write the average of the results, as in the last function here
+                WriteResult();
+            }
             if (args.Length == 0)
             {
                 Console.WriteLine("Syntax is: ffmpeg-qualityCompare FILENAME.EXT");
+                Console.WriteLine("Syntax can also be ffmpeg-qualityCompare avg, for creating the average after compare is done");
 
 
 
