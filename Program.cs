@@ -108,6 +108,7 @@ namespace ffmpeg_qualityCompare
 
             int numberOfTxt = 0;
 
+
             foreach (var file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.txt"))
             {
                 string FilenameWithExtention = file.Substring(file.LastIndexOf("\\") + 1);
@@ -116,10 +117,17 @@ namespace ffmpeg_qualityCompare
 
                 foreach (var line in lines)
                 {
-                    if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
-                        || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
-                        // Leftover from all the algorithms. Does no harm to check for the things that are disabled, Dotnet is fast enough to not make a difference
-                    {
+                    //if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
+                      //  || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
+                    if (line.Contains("Parsed_corr") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0") || line.Contains("Parsed_ssim_0")
+                        || line.Contains("VIF scale="))
+                        {
+                        if(line.Contains("VIF scale="))
+                        {
+                            // create average for this particular test file
+                            // THEN clear the particular test file result, to start the next averaging session
+
+                        }
                         string resultStr = ReadResult(line, FileNameNoExt);
                         if (resultStr.Length > 0)
                         {
@@ -132,6 +140,10 @@ namespace ffmpeg_qualityCompare
 
                 }
             }
+
+            // TODO:!
+            // needs a function that does the averaging after each set of files (eg when you meet a result you have seen before, 
+            // before adding to total average, create file average, clear, then add to total average. 
 
             try
             {
@@ -383,7 +395,6 @@ namespace ffmpeg_qualityCompare
             }
             if (args.Length == 0)
             {
-                Console.WriteLine("Syntax is: ffmpeg-qualityCompare FILENAME.EXT");
                 Console.WriteLine("Syntax can also be ffmpeg-qualityCompare avg, for creating the average after compare is done");
 
 
