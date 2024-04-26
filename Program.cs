@@ -137,7 +137,7 @@ namespace ffmpeg_qualityCompare
                             // THEN clear the particular test file result, to start the next averaging session
 
                         }
-                        string resultStr = ReadResult(line, FileNameNoExt);
+                        string resultStr = ReadResult(line, FileNameNoExt, FilenameWithExtention);
                         if (resultStr.Length > 0)
                         {
                             Filenames_and_quality.Add(resultStr);
@@ -173,7 +173,7 @@ namespace ffmpeg_qualityCompare
             }
         }
 
-        static string ReadResult(string line, string filename)
+        static string ReadResult(string line, string filenameNoExt, string filenameWithExt)
         {
             string resultStr = "";
 
@@ -199,10 +199,11 @@ namespace ffmpeg_qualityCompare
                 float VMAFFloat = float.Parse(VMAFScore);
                 VMAFFloat = VMAFFloat * 1.01f; // Average amount the VMAF score is too low based on comparing two videos against itself. 
 
-                string Filename_and_fpsStr = filename + ";" + VMAFFloat;
+                string Filename_and_fpsStr = filenameNoExt + ";" + VMAFFloat;
                 average = average + double.Parse(VMAFScore);
 
-                resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
+                //resultStr = Filename_and_fpsStr + ";" + getFileSize(filenameWithExt).ToString(); // Takes the size from the txt file, not the test file
+                resultStr = Filename_and_fpsStr;
             }
             else if (line.Contains("Parsed_msad_0"))
             {
@@ -226,11 +227,12 @@ namespace ffmpeg_qualityCompare
 
 
                 //
-                Filename_and_fpsStr = filename + ";" + actualValue;
+                Filename_and_fpsStr = filenameNoExt + ";" + actualValue;
                 average = average + actualValue;
 
 
-                resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
+                //resultStr = Filename_and_fpsStr + ";" + getFileSize(filenameWithExt).ToString(); // Takes the size from the txt file, not the test file
+                resultStr = Filename_and_fpsStr;
             }
             else if (line.Contains("Parsed_psnr_0"))
             {
@@ -239,10 +241,10 @@ namespace ffmpeg_qualityCompare
                 if (line.Contains("inf"))
                 {
                     string fps = "100";
-                    string Filename_and_fpsStr = filename + ";" + fps;
+                    string Filename_and_fpsStr = filenameNoExt + ";" + fps;
                     average = average + double.Parse(fps);
 
-                    resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
+                    resultStr = Filename_and_fpsStr + getFileSize(filenameWithExt).ToString();
                 }
                 else
                 //[Parsed_psnr_0 @ 0000020e66888480] PSNR y:32.858832 u:43.313200 v:41.155595 average:36.702531 min:36.102411 max:37.343557
@@ -259,10 +261,11 @@ namespace ffmpeg_qualityCompare
                         actualValue = 100;
                     }
 
-                    string Filename_and_fpsStr = filename + ";" + actualValue;
+                    string Filename_and_fpsStr = filenameNoExt + ";" + actualValue;
                     average = average + actualValue;
 
-                    resultStr = Filename_and_fpsStr + getFileSize(filename).ToString()  ;
+                    //resultStr = Filename_and_fpsStr + ";" + getFileSize(filenameWithExt).ToString(); // Takes the size from the txt file, not the test file
+                    resultStr = Filename_and_fpsStr;
 
                 }
 
@@ -287,11 +290,12 @@ namespace ffmpeg_qualityCompare
 
 
                 }
-                Filename_and_fpsStr = filename + ";" + resultDouble;
+                Filename_and_fpsStr = filenameNoExt + ";" + resultDouble;
                 average = average + resultDouble;
 
 
-                resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
+                //resultStr = Filename_and_fpsStr + ";" + getFileSize(filenameWithExt).ToString(); // Takes the size from the txt file, not the test file
+                resultStr = Filename_and_fpsStr;
 
 
             }
@@ -336,7 +340,8 @@ namespace ffmpeg_qualityCompare
 
                     average = average + vifScore;
 
-                    string Filename_and_vifStr = filename + ";" + vifScore.ToString();
+                    string Filename_and_vifStr = filenameNoExt + ";" + vifScore.ToString();
+                    //resultStr = Filename_and_vifStr + ";" + getFileSize(filenameWithExt).ToString(); // Takes the size from the txt file, not the test file
                     resultStr = Filename_and_vifStr;
                     vifScore = 0;
                 }
@@ -355,12 +360,12 @@ namespace ffmpeg_qualityCompare
 
 
                 
-                Filename_and_fpsStr = filename + ";" + resultDouble;
+                Filename_and_fpsStr = filenameNoExt + ";" + resultDouble;
                 average = average + resultDouble;
 
 
-                resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
-
+                //resultStr = Filename_and_fpsStr + ";" + getFileSize(filenameWithExt).ToString(); // Takes the size from the txt file, not the test file
+                resultStr = Filename_and_fpsStr;
 
             }
             //else if (line.Contains("Parsed_identity_0"))  // Identity works perfectly as code. as of 6 april 2024)
@@ -400,8 +405,9 @@ namespace ffmpeg_qualityCompare
         {
             if (args[0] =="avg")
             {
-                // Write the average of the results, as in the last function here
+            // Write the average of the results, as in the last function here
                 WriteResult();
+                return;
             }
             if (args.Length == 0)
             {
@@ -468,7 +474,7 @@ namespace ffmpeg_qualityCompare
             }
             else
             {
-                return;
+               
             }
 
             Console.WriteLine("Want to calculate the average scores? Y/N with enter");
