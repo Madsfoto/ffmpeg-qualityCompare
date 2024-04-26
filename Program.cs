@@ -10,6 +10,7 @@ namespace ffmpeg_qualityCompare
     {
         static double average = 0;
         static double vifScore = 0;
+        long filesizeLong = 0;
 
         static string compareBatFilename = "0-compare.bat";
 
@@ -102,11 +103,19 @@ namespace ffmpeg_qualityCompare
 
         }
 
+        static long getFileSize(string fileName)
+        {
+            FileInfo fi = new FileInfo(fileName);
+            return fi.Length;
+        }
+        
         static void WriteResult()
         {
             List<string> Filenames_and_quality = new List<string>();
 
             int numberOfTxt = 0;
+            string testfileStr = "";
+            double testfileResultDouble = 0;
 
 
             foreach (var file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.txt"))
