@@ -177,6 +177,7 @@ namespace ffmpeg_qualityCompare
         {
             string resultStr = "";
 
+
             if (line.Contains("VMAF score"))
             {
 
@@ -201,7 +202,7 @@ namespace ffmpeg_qualityCompare
                 string Filename_and_fpsStr = filename + ";" + VMAFFloat;
                 average = average + double.Parse(VMAFScore);
 
-                resultStr = Filename_and_fpsStr;
+                resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
             }
             else if (line.Contains("Parsed_msad_0"))
             {
@@ -229,7 +230,7 @@ namespace ffmpeg_qualityCompare
                 average = average + actualValue;
 
 
-                resultStr = Filename_and_fpsStr;
+                resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
             }
             else if (line.Contains("Parsed_psnr_0"))
             {
@@ -241,7 +242,7 @@ namespace ffmpeg_qualityCompare
                     string Filename_and_fpsStr = filename + ";" + fps;
                     average = average + double.Parse(fps);
 
-                    resultStr = Filename_and_fpsStr;
+                    resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
                 }
                 else
                 //[Parsed_psnr_0 @ 0000020e66888480] PSNR y:32.858832 u:43.313200 v:41.155595 average:36.702531 min:36.102411 max:37.343557
@@ -261,7 +262,7 @@ namespace ffmpeg_qualityCompare
                     string Filename_and_fpsStr = filename + ";" + actualValue;
                     average = average + actualValue;
 
-                    resultStr = Filename_and_fpsStr;
+                    resultStr = Filename_and_fpsStr + getFileSize(filename).ToString()  ;
 
                 }
 
@@ -290,7 +291,7 @@ namespace ffmpeg_qualityCompare
                 average = average + resultDouble;
 
 
-                resultStr = Filename_and_fpsStr;
+                resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
 
 
             }
@@ -358,7 +359,7 @@ namespace ffmpeg_qualityCompare
                 average = average + resultDouble;
 
 
-                resultStr = Filename_and_fpsStr;
+                resultStr = Filename_and_fpsStr + getFileSize(filename).ToString();
 
 
             }
