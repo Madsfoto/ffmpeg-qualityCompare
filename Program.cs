@@ -145,15 +145,26 @@ namespace ffmpeg_qualityCompare
                 string FilenameWithExtention = file.Substring(file.LastIndexOf("\\") + 1);
                 string FileNameNoExt = FilenameWithExtention.Substring(0, FilenameWithExtention.Length - 4);
                 var lines = File.ReadLines(file);
+                int bitdepth = 8;
 
                 foreach (var line in lines)
+                {
+                    if (line.Contains("p10le"))
+                    {
+                        bitdepth = 10;
+                    }
+                }
+
+
+
+                    foreach (var line in lines)
                 {
                     //if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
                       //  || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
                     if (line.Contains("Parsed_corr") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0") || line.Contains("Parsed_ssim_0")
                         || line.Contains("VIF scale="))
                         {
-                        resultStr = ReadResult(line, FileNameNoExt);
+                        resultStr = ReadResult(line, FileNameNoExt, bitdepth);
                         if (resultStr.Length > 0)
                         {
                             Filenames_and_quality.Add(resultStr);
@@ -413,7 +424,7 @@ namespace ffmpeg_qualityCompare
         //    return resultStr;
         //}
 
-        static string ReadResult(string line, string filenameNoExt)
+        static string ReadResult(string line, string filenameNoExt, int bitdepth)
         {
             string resultStr = "";
             if (line.Contains("Parsed_corr_0")&&(line.Contains("average:")))
@@ -438,8 +449,6 @@ namespace ffmpeg_qualityCompare
                 resultStr = Filename_and_fpsStr;
 
             }
-
-
 
             else if (line.Contains("Parsed_msad_0") && (line.Contains("average:")))
             {
@@ -486,16 +495,34 @@ namespace ffmpeg_qualityCompare
                 //[Parsed_psnr_0 @ 0000020e66888480] PSNR y:32.858832 u:43.313200 v:41.155595 average:36.702531 min:36.102411 max:37.343557
                 //[Parsed_psnr_0 @ 000001aa9aebef00] PSNR y:33.029119 u:44.250376 v:42.139314 average:37.014945 min:36.360319 max:37.750726
                 {
-                    //for 8 bit, the max PSNR is 48,164799 (20*log(256), it's higher for 10 bit, but I clamp it at 100, even for 10 bit videos. 
-                    //TODO FIXME: One division for 8 and one for 10 bit
+                    // for 8 bit, the max PSNR is 48,164799 (20*log10(256).
+                    // for 10 bit, the max PSNR is 60,205999 (20*log10(1024).
+
+                    // TODO FIXME: One division for 8 and one for 10 bit
                     // meaning that any value is divided by 0.6 to get a normalized value in the 0-100 range. 
-                    string ParseResult = line.Substring(line.IndexOf("average:") + 9, 9);
+                    string ParseResult = line.Substring(line.IndexOf("average:") + 8, 9);
+                    
                     ParseResult = ParseResult.Replace(".", ",");
-                    double actualValue = double.Parse(ParseResult) / 0.48164799;
-                    if (actualValue > 100)
+                    double actualValue = double.Parse(ParseResult);
+
+                    if (bitdepth==8)
                     {
-                        actualValue = 100;
+                        actualValue = actualValue / 0.48164799;
+                        if (actualValue > 100)
+                        {
+                            actualValue = 100;
+                        }
                     }
+                    else
+                    {
+                        actualValue = actualValue / 0.60205999;
+                        if (actualValue > 100)
+                        {
+                            actualValue = 100;
+                        }
+
+                    }
+                    
 
                     string Filename_and_fpsStr = filenameNoExt + ";" + actualValue;
                     average = average + actualValue;
