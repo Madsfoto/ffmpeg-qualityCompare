@@ -11,9 +11,15 @@ namespace ffmpeg_qualityCompare
         static double average = 0;
         static double vifScore = 0;
         static double fileAverage = 0;
+        static int bitdepth = 8;
         
 
         static string compareBatFilename = "0-compare.bat";
+        
+        static void setBitDepth(int depth)
+            { bitdepth = depth; }
+        static int getBitDepth() { return bitdepth; }
+
 
         static List<string> createBatContentList(string modifiedFile, string referenceFile)
         {
@@ -145,13 +151,13 @@ namespace ffmpeg_qualityCompare
                 string FilenameWithExtention = file.Substring(file.LastIndexOf("\\") + 1);
                 string FileNameNoExt = FilenameWithExtention.Substring(0, FilenameWithExtention.Length - 4);
                 var lines = File.ReadLines(file);
-                int bitdepth = 8;
+                setBitDepth(8);
 
                 foreach (var line in lines)
                 {
                     if (line.Contains("p10le"))
                     {
-                        bitdepth = 10;
+                        setBitDepth(10);
                     }
                 }
 
@@ -164,7 +170,7 @@ namespace ffmpeg_qualityCompare
                     if (line.Contains("Parsed_corr") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0") || line.Contains("Parsed_ssim_0")
                         || line.Contains("VIF scale="))
                         {
-                        resultStr = ReadResult(line, FileNameNoExt, bitdepth);
+                        resultStr = ReadResult(line, FileNameNoExt, getBitDepth());
                         if (resultStr.Length > 0)
                         {
                             Filenames_and_quality.Add(resultStr);
