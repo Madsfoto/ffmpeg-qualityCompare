@@ -68,7 +68,7 @@ namespace ffmpeg_qualityCompare
             //ffmpeg -i main.mpg -i ref.mpg -lavfi psnr -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi identity -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi vif -f null -
-            //ffmpeg -i main.mpg -i ref.mpg -lavfi libvmaf -f null -
+            //ffmpeg -i main.mpg -i ref.mpg -lavfi libvmaf -f null - // not used as unreliable
             //ffmpeg -i main.mpg -i ref.mpg -lavfi msad -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi corr -f null -
 
@@ -416,13 +416,15 @@ namespace ffmpeg_qualityCompare
         static string ReadResult(string line, string filenameNoExt)
         {
             string resultStr = "";
-            if (line.Contains("Parsed_corr_0"))
+            if (line.Contains("Parsed_corr_0")&&(line.Contains("average:")))
             {
 
                 double resultDouble = 0;
                 string Filename_and_fpsStr = "";
 
+                
                 //[Parsed_corr_0 @ 000002885d5fe9c0] corr Y:1.000000 U:1.000000 V:1.000000 average:1.000000 min:1.000000 max:1.000000
+                //[Parsed_corr_0 @ 000002a55ef0ee80] corr Y:0.999749 U:0.999297 V:0.999555 average:0.999534 min:0.895737 max:1.000000
 
                 resultDouble = double.Parse(line.Substring(line.IndexOf("average:") + 8, 8).Replace(".", ",")) * 100;
 
@@ -439,7 +441,7 @@ namespace ffmpeg_qualityCompare
 
 
 
-            else if (line.Contains("Parsed_msad_0"))
+            else if (line.Contains("Parsed_msad_0") && (line.Contains("average:")))
             {
 
                 double resultDouble = 0;
@@ -466,7 +468,7 @@ namespace ffmpeg_qualityCompare
                 //resultStr = Filename_and_fpsStr + ";" + getFileSize(filenameWithExt).ToString(); // Takes the size from the txt file, not the test file
                 resultStr = Filename_and_fpsStr;
             }
-            else if (line.Contains("Parsed_psnr_0"))
+            else if (line.Contains("Parsed_psnr_0") && (line.Contains("average:")))
             {
 
                 //[Parsed_psnr_0 @ 000001d959af5180] PSNR r:inf g:inf b:inf a:inf average:inf min:inf max:inf
@@ -487,9 +489,9 @@ namespace ffmpeg_qualityCompare
                     //for 8 bit, the max PSNR is 48,164799 (20*log(256), it's higher for 10 bit, but I clamp it at 100, even for 10 bit videos. 
                     //TODO FIXME: One division for 8 and one for 10 bit
                     // meaning that any value is divided by 0.6 to get a normalized value in the 0-100 range. 
-                    string fps = line.Substring(84).Substring(0, 9);
-                    fps = fps.Replace(".", ",");
-                    double actualValue = double.Parse(fps) / 0.48164799;
+                    string ParseResult = line.Substring(line.IndexOf("average:") + 9, 9);
+                    ParseResult = ParseResult.Replace(".", ",");
+                    double actualValue = double.Parse(ParseResult) / 0.48164799;
                     if (actualValue > 100)
                     {
                         actualValue = 100;
@@ -505,7 +507,7 @@ namespace ffmpeg_qualityCompare
 
 
             }
-            else if (line.Contains("Parsed_ssim_0"))
+            else if (line.Contains("Parsed_ssim_0") && (line.Contains("All:")))
             {
 
                 double resultDouble = 0;
@@ -533,7 +535,7 @@ namespace ffmpeg_qualityCompare
 
 
             }
-            else if (line.Contains("VIF scale="))
+            else if (line.Contains("VIF scale=") && (line.Contains("average:")))
             {
 
 
