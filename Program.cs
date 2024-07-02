@@ -181,11 +181,11 @@ namespace ffmpeg_qualityCompare
                                 string actualfilename = FileNameNoExt.Substring(0, FileNameNoExt.Length - 4); ; // TODO: needs to be changed to the actual thing
                                 
 
-                                testfileResultDouble = fileAverage / 5; // TODO: Actual test file result.
+                                testfileResultDouble = fileAverage / 5; // TODO: Actual number of test file results.
 
                                 Filenames_and_quality.Add(""); // empty line
-                                Filenames_and_quality.Add(actualfilename + ";" + testfileResultDouble);
-
+                                Filenames_and_quality.Add(actualfilename + " average: " + testfileResultDouble+" ");
+                                
                                 Filenames_and_quality.Add(""); // empty line
                                 fileAverage = 0;
 
