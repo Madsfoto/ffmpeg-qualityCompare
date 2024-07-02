@@ -16,12 +16,12 @@ namespace ffmpeg_qualityCompare
 
         static string compareBatFilename = "0-compare.bat";
         
-        static void setBitDepth(int depth)
+        static void SetBitDepth(int depth)
             { bitdepth = depth; }
-        static int getBitDepth() { return bitdepth; }
+        static int GetBitDepth() { return bitdepth; }
 
 
-        static List<string> createBatContentList(string modifiedFile, string referenceFile)
+        static List<string> CreateBatContentList(string modifiedFile, string referenceFile)
         {
             List<string> batList = new List<string>();
 
@@ -64,7 +64,7 @@ namespace ffmpeg_qualityCompare
             return batList;
 
         }
-        static void filegen(string modifiedFile, string referenceFile, bool everyFile)
+        static void Filegen(string modifiedFile, string referenceFile, bool everyFile)
         {
 
 
@@ -85,23 +85,23 @@ namespace ffmpeg_qualityCompare
             {
                 foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mov"))
                 {
-                    ffmpegBatList.AddRange(createBatContentList(modifiedFileFromDir, referenceFile));
+                    ffmpegBatList.AddRange(CreateBatContentList(modifiedFileFromDir, referenceFile));
 
                 }
                 foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mp4"))
                 {
-                    ffmpegBatList.AddRange(createBatContentList(modifiedFileFromDir, referenceFile));
+                    ffmpegBatList.AddRange(CreateBatContentList(modifiedFileFromDir, referenceFile));
 
                 }
                 foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mkv"))
                 {
-                    ffmpegBatList.AddRange(createBatContentList(modifiedFileFromDir, referenceFile));
+                    ffmpegBatList.AddRange(CreateBatContentList(modifiedFileFromDir, referenceFile));
 
                 }
             }
             else
             {
-                ffmpegBatList.AddRange(createBatContentList(modifiedFile, referenceFile));
+                ffmpegBatList.AddRange(CreateBatContentList(modifiedFile, referenceFile));
 
             }
 
@@ -110,7 +110,7 @@ namespace ffmpeg_qualityCompare
 
         }
 
-        static long getFileSize(string fileName)
+        static long GetFileSize(string fileName)
         {
             FileInfo fi = new FileInfo(fileName);
             return fi.Length;
@@ -152,13 +152,13 @@ namespace ffmpeg_qualityCompare
                 string FilenameWithExtention = file.Substring(file.LastIndexOf("\\") + 1);
                 string FileNameNoExt = FilenameWithExtention.Substring(0, FilenameWithExtention.Length - 4);
                 var lines = File.ReadLines(file);
-                setBitDepth(8);
+                SetBitDepth(8);
 
                 foreach (var line in lines)
                 {
                     if (line.Contains("p10le"))
                     {
-                        setBitDepth(10);
+                        SetBitDepth(10);
                     }
                 }
 
@@ -171,7 +171,7 @@ namespace ffmpeg_qualityCompare
                     if (line.Contains("Parsed_corr") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0") || line.Contains("Parsed_ssim_0")
                         || line.Contains("VIF scale="))
                         {
-                        resultStr = ReadResult(line, FileNameNoExt, getBitDepth());
+                        resultStr = ReadResult(line, FileNameNoExt, GetBitDepth());
                         if (resultStr.Length > 0)
                         {
                             Filenames_and_quality.Add(resultStr);
@@ -646,7 +646,7 @@ namespace ffmpeg_qualityCompare
                 string referenceFileCMD = Console.ReadLine();
                 if (referenceFileCMD.Length == 0)
                 {
-                    filegen("MODIFIED", "REFERENCE", false);
+                    Filegen("MODIFIED", "REFERENCE", false);
                 }
                 if (referenceFileCMD.Length < 4)
                 {
@@ -658,7 +658,7 @@ namespace ffmpeg_qualityCompare
                     Console.WriteLine("Do you want to compare against every mov|mp4|mkv file in the current directory? Y/N and Return");
                     if (Console.ReadLine() == "y")
                     {
-                        filegen("", referenceFileCMD, true);
+                        Filegen("", referenceFileCMD, true);
                     }
                     else
                     {
@@ -676,7 +676,7 @@ namespace ffmpeg_qualityCompare
                         }
                         else
                         {
-                            filegen(modifiedFileCMD, referenceFileCMD, false);
+                            Filegen(modifiedFileCMD, referenceFileCMD, false);
                         }
 
                     }
