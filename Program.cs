@@ -217,9 +217,12 @@ namespace ffmpeg_qualityCompare
                     //if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
                     //  || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
                     if (line.Contains("Parsed_corr") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0") || line.Contains("Parsed_ssim_0")
-                        || line.Contains("VIF scale="))
+                        || line.Contains("VIF scale=")||line.Contains("Filesize;")) 
+                        
+                        // REMEMBER TO CHANGE THE LIST IN ReadResultLine()
+
                     {
-                        resultStr = ReadResult(line, FileNameNoExt, GetBitDepth());
+                        resultStr = ReadResultLine(line, FileNameNoExt, GetBitDepth());
                         if (resultStr.Length > 0)
                         {
                             Filenames_and_quality.Add(resultStr);
@@ -479,9 +482,12 @@ namespace ffmpeg_qualityCompare
         //    return resultStr;
         //}
 
-        static string ReadResult(string line, string filenameNoExt, int bitdepth) // read result from ffmpeg output text file
+        static string ReadResultLine(string line, string filenameNoExt, int bitdepth) // read result from ffmpeg output text file
         {
             string resultStr = "";
+
+            // REMEBER TO CHANGE THE LIST IN WriteResult()
+
             if (line.Contains("Parsed_corr_0") && (line.Contains("average:")))
             {
 
@@ -665,6 +671,15 @@ namespace ffmpeg_qualityCompare
                     vifScore = 0;
                 }
 
+
+            }
+            else if (line.Contains("Filesize;"))
+            {
+                // line is
+                // Filesize;QP18_422p10le;267238961
+                string result = line.Substring(line.IndexOf(";")+1);
+                // result should be QP18_422p10le;267238961  which is what we want
+                resultStr= result;
 
             }
 
