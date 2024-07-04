@@ -26,11 +26,11 @@ namespace ffmpeg_qualityCompare
         {
             List<string> batList = new List<string>();
 
-            string compareNoExt = compareFile.Substring(0, (compareFile.Length - 4));
+            
             string compareWithExtension = compareFile.Substring(compareFile.LastIndexOf("\\") + 1);
             string compareCorrect = compareWithExtension.Substring(0, compareWithExtension.Length - 4);
 
-            string referenceNoExt = referenceFile.Substring(0, (referenceFile.Length - 4));
+            
             string referenceWithExtension = referenceFile.Substring(referenceFile.LastIndexOf("\\") + 1);
             string referenceCorrect = referenceWithExtension.Substring(0, referenceWithExtension.Length - 4);
 
@@ -70,10 +70,48 @@ namespace ffmpeg_qualityCompare
 
         }
 
-        static void filenamegen(string filename)
+        static void filesizeGen()
         {
-            File.WriteAllText(filename, filename);
+            //Filesize; Filename; SIZE
+
+            List<string> filesizeList = new List<string>();
+            
+
+
+            foreach (var COMPAREFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mov"))
+            {
+                filesizeList.Add(COMPAREFileFromDir);
+
+            }
+            foreach (var COMPAREFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mp4"))
+            {
+                filesizeList.Add(COMPAREFileFromDir);
+
+            }
+            foreach (var COMPAREFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mkv"))
+            {
+                filesizeList.Add(COMPAREFileFromDir);
+
+            }
+
+            foreach (var MovMp4Mkv in filesizeList)
+            {
+                FileInfo fi = new FileInfo(MovMp4Mkv);
+                long filesize = fi.Length;
+                // for each source file, write one txt file!
+                Console.WriteLine(MovMp4Mkv);
+                string content = "Filesize; " + MovMp4Mkv +";"+ filesize.ToString();
+                File.WriteAllText(MovMp4Mkv + ".txt", content);
+
+            }
+
+            
+                     
+            
+
+            //File.WriteAllLines(fileName+".txt", content);
         }
+        
         static void Filegen(string compareFile, string referenceFile, bool everyFile)
         {
 
@@ -115,16 +153,12 @@ namespace ffmpeg_qualityCompare
 
             }
 
-            //filenamegen(compareFile);
+            
             File.WriteAllLines(compareBatFilename, ffmpegBatList);
 
         }
 
-        static long GetFileSize(string fileName)
-        {
-            FileInfo fi = new FileInfo(fileName);
-            return fi.Length;
-        }
+        
 
         static void WriteResultFile(int numberOfTxt, List<string> Filenames_and_quality)
         {
@@ -635,16 +669,32 @@ namespace ffmpeg_qualityCompare
         {
             if (args.Length != 0)
             {
-                if (args[0] == "avg")
+                // Write the average of the results, as in the last function here
+                if (args[0] == "avg") 
                 {
-                    // Write the average of the results, as in the last function here
                     WriteResult();
                     return;
                 }
+                if(args[0] == "size")
+                {
+                    // for all mkv,mov,mp4 files 
+                    // write txt file with the source filename+.txt
+                    // content: Filesize;Filename;SIZE
+                    filesizeGen();
+                }
+
+
+
+
+
+                return;
             }
 
+            
 
-            else if (args.Length == 0)
+
+            // normal operation
+            else if (args.Length == 0) 
             {
                 Console.WriteLine("Syntax can also be ffmpeg-qualityCompare avg, for creating the average after compare is done");
 
