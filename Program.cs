@@ -672,14 +672,9 @@ namespace ffmpeg_qualityCompare
                     {
                         Console.WriteLine("Write COMPARE filename");
                         String compareFileCMD = Console.ReadLine();
-                        if (compareFileCMD.Length == 0)
+                        if (compareFileCMD.Length == 0||compareFileCMD.Length<4)
                         {
-                            Console.WriteLine("COMPARE can not be empty");
-                            return;
-                        }
-                        else if (compareFileCMD.Length < 4)
-                        {
-                            Console.WriteLine("COMPARE must have a full extension, eg .mov");
+                            Console.WriteLine("COMPARE can not be empty or not have a full extention, eg .mov");
                             return;
                         }
                         else
