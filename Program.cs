@@ -12,7 +12,8 @@ namespace ffmpeg_qualityCompare
         static double vifScore = 0;
         static double fileAverage = 0;
         static int bitdepth = 8;
-        
+        static List<string> Filenames_and_quality = new List<string>(); // the list where every piece of information is stored. TODO: rename to Filenames_Size_and_Quality
+
 
         static string compareBatFilename = "0-compare.bat";
         
@@ -21,19 +22,19 @@ namespace ffmpeg_qualityCompare
         static int GetBitDepth() { return bitdepth; }
 
 
-        static List<string> CreateBatContentList(string modifiedFile, string referenceFile)
+        static List<string> CreateBatContentList(string compareFile, string referenceFile)
         {
             List<string> batList = new List<string>();
 
-            string modifiedNoExt = modifiedFile.Substring(0, (modifiedFile.Length - 4));
-            string modifiedWithExtension = modifiedFile.Substring(modifiedFile.LastIndexOf("\\") + 1);
-            string modifiedCorrect = modifiedWithExtension.Substring(0, modifiedWithExtension.Length - 4);
+            string compareNoExt = compareFile.Substring(0, (compareFile.Length - 4));
+            string compareWithExtension = compareFile.Substring(compareFile.LastIndexOf("\\") + 1);
+            string compareCorrect = compareWithExtension.Substring(0, compareWithExtension.Length - 4);
 
             string referenceNoExt = referenceFile.Substring(0, (referenceFile.Length - 4));
             string referenceWithExtension = referenceFile.Substring(referenceFile.LastIndexOf("\\") + 1);
             string referenceCorrect = referenceWithExtension.Substring(0, referenceWithExtension.Length - 4);
 
-            if (modifiedCorrect == referenceCorrect)
+            if (compareCorrect == referenceCorrect)
             {
                 return batList;
             }
@@ -43,20 +44,24 @@ namespace ffmpeg_qualityCompare
 
             for (int algoInt = 0; algoInt < algoArr.Length; algoInt++)
             {
-                string ffStr = "ffmpeg -i " + "\"" + modifiedWithExtension + "\"" + " -i " + "\"" + referenceWithExtension + "\"" + " -lavfi " + algoArr[algoInt];
-                string txtStr = " -f null - 2> " + "\"" + modifiedCorrect + "_" + referenceCorrect + "_" + algoArr[algoInt] + ".txt" + "\"";
+                string ffStr = "ffmpeg -i " + "\"" + compareWithExtension + "\"" + " -i " + "\"" + referenceWithExtension + "\"" + " -lavfi " + algoArr[algoInt];
+                string txtStr = " -f null - 2> " + "\"" + compareCorrect + "_" + referenceCorrect + "_" + algoArr[algoInt] + ".txt" + "\"";
 
-                if (algoArr[algoInt] == "libvmaf")
-                {
-                    // specific code for libvmaf. The model path always needs to be escaped: "libvmaf=model_path=vmaf_v0.6.1.json "
-                    ffStr = ffStr + "=model_path=vmaf_v0.6.1.json";
-                    ffStr = ffStr + txtStr;
+                // Old libvmaf 
+                    /*
+                     * if (algoArr[algoInt] == "libvmaf")
+                    {
+                        // specific code for libvmaf. The model path always needs to be escaped: "libvmaf=model_path=vmaf_v0.6.1.json "
+                        ffStr = ffStr + "=model_path=vmaf_v0.6.1.json";
+                        ffStr = ffStr + txtStr;
 
-                }
-                else
-                {
+                    }
+                     * 
+                     * 
+                     */
+
                     ffStr = ffStr + txtStr;
-                }
+                
 
                 batList.Add(ffStr);
 
@@ -140,9 +145,6 @@ namespace ffmpeg_qualityCompare
         }
         static void WriteResult()
         {
-            List<string> Filenames_and_quality = new List<string>();
-            
-
             int numberOfTxt = 0;
             double testfileResultDouble = 0;
             string resultStr = "";
@@ -154,6 +156,7 @@ namespace ffmpeg_qualityCompare
                 var lines = File.ReadLines(file);
                 SetBitDepth(8);
 
+                // find bit depth
                 foreach (var line in lines)
                 {
                     if (line.Contains("p10le"))
@@ -163,8 +166,8 @@ namespace ffmpeg_qualityCompare
                 }
 
 
-
-                    foreach (var line in lines)
+                // write results to list
+                foreach (var line in lines)
                 {
                     //if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
                       //  || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
@@ -431,7 +434,7 @@ namespace ffmpeg_qualityCompare
         //    return resultStr;
         //}
 
-        static string ReadResult(string line, string filenameNoExt, int bitdepth)
+        static string ReadResult(string line, string filenameNoExt, int bitdepth) // read result from ffmpeg output text file
         {
             string resultStr = "";
             if (line.Contains("Parsed_corr_0")&&(line.Contains("average:")))
