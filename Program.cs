@@ -26,11 +26,11 @@ namespace ffmpeg_qualityCompare
         {
             List<string> batList = new List<string>();
 
-            
+
             string compareWithExtension = compareFile.Substring(compareFile.LastIndexOf("\\") + 1);
             string compareCorrect = compareWithExtension.Substring(0, compareWithExtension.Length - 4);
 
-            
+
             string referenceWithExtension = referenceFile.Substring(referenceFile.LastIndexOf("\\") + 1);
             string referenceCorrect = referenceWithExtension.Substring(0, referenceWithExtension.Length - 4);
 
@@ -75,7 +75,7 @@ namespace ffmpeg_qualityCompare
             //Filesize; Filename; SIZE
 
             List<string> filesizeList = new List<string>();
-            
+
 
 
             foreach (var COMPAREFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mov"))
@@ -99,24 +99,24 @@ namespace ffmpeg_qualityCompare
                 string FilenameWithExtention = MovMp4Mkv.Substring(MovMp4Mkv.LastIndexOf("\\") + 1);
                 string MovMp4MkvNoExt = FilenameWithExtention.Substring(0, FilenameWithExtention.Length - 4);
 
-                
+
 
                 //string  = MovMp4Mkv.Substring(MovMp4Mkv.LastIndexOf("\\") + 1).Substring(0, MovMp4Mkv.Length - 4);
 
                 FileInfo fi = new FileInfo(MovMp4Mkv);
                 long filesize = fi.Length;
-                string content = "Filesize;" + MovMp4MkvNoExt + ";"+ filesize.ToString();
+                string content = "Filesize;" + MovMp4MkvNoExt + ";" + filesize.ToString();
                 File.WriteAllText(MovMp4MkvNoExt + ".txt", content);
 
             }
 
-            
-                     
-            
+
+
+
 
             //File.WriteAllLines(fileName+".txt", content);
         }
-        
+
         static void Filegen(string compareFile, string referenceFile, bool everyFile)
         {
 
@@ -158,14 +158,15 @@ namespace ffmpeg_qualityCompare
 
             }
 
-            
+
             File.WriteAllLines(compareBatFilename, ffmpegBatList);
 
         }
 
-        
 
-        static void WriteResultFile(int numberOfTxt, List<string> Filenames_and_quality)
+
+        //static void WriteResultFile(int numberOfTxt, List<string> Filenames_and_quality)
+        static void WriteResultFile(int numberOfTxt)
         {
             try
             {
@@ -245,7 +246,7 @@ namespace ffmpeg_qualityCompare
                 }
             }
 
-            WriteResultFile(numberOfTxt, Filenames_and_quality);
+            WriteResultFile(numberOfTxt);
 
 
 
@@ -675,12 +676,12 @@ namespace ffmpeg_qualityCompare
             if (args.Length != 0)
             {
                 // Write the average of the results, as in the last function here
-                if (args[0] == "avg") 
+                if (args[0] == "avg")
                 {
                     WriteResult();
                     return;
                 }
-                if(args[0] == "size")
+                if (args[0] == "size")
                 {
                     // for all mkv,mov,mp4 files 
                     // write txt file with the source filename+.txt
@@ -695,11 +696,11 @@ namespace ffmpeg_qualityCompare
                 return;
             }
 
-            
+
 
 
             // normal operation
-            else if (args.Length == 0) 
+            else if (args.Length == 0)
             {
                 Console.WriteLine("Syntax can also be ffmpeg-qualityCompare avg, for creating the average after compare is done");
 
@@ -728,7 +729,7 @@ namespace ffmpeg_qualityCompare
                     {
                         Console.WriteLine("Write COMPARE filename");
                         String compareFileCMD = Console.ReadLine();
-                        if (compareFileCMD.Length == 0||compareFileCMD.Length<4)
+                        if (compareFileCMD.Length == 0 || compareFileCMD.Length < 4)
                         {
                             Console.WriteLine("COMPARE can not be empty or not have a full extention, eg .mov");
                             return;
