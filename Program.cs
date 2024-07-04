@@ -96,12 +96,17 @@ namespace ffmpeg_qualityCompare
 
             foreach (var MovMp4Mkv in filesizeList)
             {
+                string FilenameWithExtention = MovMp4Mkv.Substring(MovMp4Mkv.LastIndexOf("\\") + 1);
+                string MovMp4MkvNoExt = FilenameWithExtention.Substring(0, FilenameWithExtention.Length - 4);
+
+                
+
+                //string  = MovMp4Mkv.Substring(MovMp4Mkv.LastIndexOf("\\") + 1).Substring(0, MovMp4Mkv.Length - 4);
+
                 FileInfo fi = new FileInfo(MovMp4Mkv);
                 long filesize = fi.Length;
-                // for each source file, write one txt file!
-                Console.WriteLine(MovMp4Mkv);
-                string content = "Filesize; " + MovMp4Mkv +";"+ filesize.ToString();
-                File.WriteAllText(MovMp4Mkv + ".txt", content);
+                string content = "Filesize;" + MovMp4MkvNoExt + ";"+ filesize.ToString();
+                File.WriteAllText(MovMp4MkvNoExt + ".txt", content);
 
             }
 
@@ -717,6 +722,7 @@ namespace ffmpeg_qualityCompare
                     if (Console.ReadLine() == "y")
                     {
                         Filegen("", referenceFileCMD, true);
+                        filesizeGen();
                     }
                     else
                     {
