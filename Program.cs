@@ -16,9 +16,9 @@ namespace ffmpeg_qualityCompare
 
 
         static string compareBatFilename = "0-compare.bat";
-        
+
         static void SetBitDepth(int depth)
-            { bitdepth = depth; }
+        { bitdepth = depth; }
         static int GetBitDepth() { return bitdepth; }
 
 
@@ -48,20 +48,20 @@ namespace ffmpeg_qualityCompare
                 string txtStr = " -f null - 2> " + "\"" + compareCorrect + "_" + referenceCorrect + "_" + algoArr[algoInt] + ".txt" + "\"";
 
                 // Old libvmaf 
-                    /*
-                     * if (algoArr[algoInt] == "libvmaf")
-                    {
-                        // specific code for libvmaf. The model path always needs to be escaped: "libvmaf=model_path=vmaf_v0.6.1.json "
-                        ffStr = ffStr + "=model_path=vmaf_v0.6.1.json";
-                        ffStr = ffStr + txtStr;
-
-                    }
-                     * 
-                     * 
-                     */
-
+                /*
+                 * if (algoArr[algoInt] == "libvmaf")
+                {
+                    // specific code for libvmaf. The model path always needs to be escaped: "libvmaf=model_path=vmaf_v0.6.1.json "
+                    ffStr = ffStr + "=model_path=vmaf_v0.6.1.json";
                     ffStr = ffStr + txtStr;
-                
+
+                }
+                 * 
+                 * 
+                 */
+
+                ffStr = ffStr + txtStr;
+
 
                 batList.Add(ffStr);
 
@@ -69,7 +69,12 @@ namespace ffmpeg_qualityCompare
             return batList;
 
         }
-        static void Filegen(string modifiedFile, string referenceFile, bool everyFile)
+
+        static void filenamegen(string filename)
+        {
+            File.WriteAllText(filename, filename);
+        }
+        static void Filegen(string compareFile, string referenceFile, bool everyFile)
         {
 
 
@@ -106,11 +111,11 @@ namespace ffmpeg_qualityCompare
             }
             else
             {
-                ffmpegBatList.AddRange(CreateBatContentList(modifiedFile, referenceFile));
+                ffmpegBatList.AddRange(CreateBatContentList(compareFile, referenceFile));
 
             }
 
-
+            //filenamegen(compareFile);
             File.WriteAllLines(compareBatFilename, ffmpegBatList);
 
         }
@@ -120,7 +125,7 @@ namespace ffmpeg_qualityCompare
             FileInfo fi = new FileInfo(fileName);
             return fi.Length;
         }
-        
+
         static void WriteResultFile(int numberOfTxt, List<string> Filenames_and_quality)
         {
             try
@@ -170,10 +175,10 @@ namespace ffmpeg_qualityCompare
                 foreach (var line in lines)
                 {
                     //if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
-                      //  || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
+                    //  || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
                     if (line.Contains("Parsed_corr") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0") || line.Contains("Parsed_ssim_0")
                         || line.Contains("VIF scale="))
-                        {
+                    {
                         resultStr = ReadResult(line, FileNameNoExt, GetBitDepth());
                         if (resultStr.Length > 0)
                         {
@@ -182,13 +187,13 @@ namespace ffmpeg_qualityCompare
                             if (line.Contains("VIF scale="))
                             {
                                 string actualfilename = FileNameNoExt.Substring(0, FileNameNoExt.Length - 4); ; // TODO: needs to be changed to the actual thing
-                                
+
 
                                 testfileResultDouble = fileAverage / 5; // TODO: Actual number of test file results.
 
                                 Filenames_and_quality.Add(""); // empty line
-                                Filenames_and_quality.Add(actualfilename + " average: " + testfileResultDouble+" ");
-                                
+                                Filenames_and_quality.Add(actualfilename + " average: " + testfileResultDouble + " ");
+
                                 Filenames_and_quality.Add(""); // empty line
                                 fileAverage = 0;
 
@@ -437,13 +442,13 @@ namespace ffmpeg_qualityCompare
         static string ReadResult(string line, string filenameNoExt, int bitdepth) // read result from ffmpeg output text file
         {
             string resultStr = "";
-            if (line.Contains("Parsed_corr_0")&&(line.Contains("average:")))
+            if (line.Contains("Parsed_corr_0") && (line.Contains("average:")))
             {
 
                 double resultDouble = 0;
                 string Filename_and_fpsStr = "";
 
-                
+
                 //[Parsed_corr_0 @ 000002885d5fe9c0] corr Y:1.000000 U:1.000000 V:1.000000 average:1.000000 min:1.000000 max:1.000000
                 //[Parsed_corr_0 @ 000002a55ef0ee80] corr Y:0.999749 U:0.999297 V:0.999555 average:0.999534 min:0.895737 max:1.000000
 
@@ -482,7 +487,7 @@ namespace ffmpeg_qualityCompare
 
                 Filename_and_fpsStr = filenameNoExt + ";" + resultDouble;
                 average = average + resultDouble;
-                fileAverage = fileAverage+resultDouble;
+                fileAverage = fileAverage + resultDouble;
 
                 //resultStr = Filename_and_fpsStr + ";" + getFileSize(filenameWithExt).ToString(); // Takes the size from the txt file, not the test file
                 resultStr = Filename_and_fpsStr;
@@ -511,11 +516,11 @@ namespace ffmpeg_qualityCompare
                     // TODO FIXME: One division for 8 and one for 10 bit
                     // meaning that any value is divided by 0.6 to get a normalized value in the 0-100 range. 
                     string ParseResult = line.Substring(line.IndexOf("average:") + 8, 9);
-                    
+
                     ParseResult = ParseResult.Replace(".", ",");
                     double actualValue = double.Parse(ParseResult);
 
-                    if (bitdepth==8)
+                    if (bitdepth == 8)
                     {
                         actualValue = actualValue / 0.48164799;
                         if (actualValue > 100)
@@ -532,7 +537,7 @@ namespace ffmpeg_qualityCompare
                         }
 
                     }
-                    
+
 
                     string Filename_and_fpsStr = filenameNoExt + ";" + actualValue;
                     average = average + actualValue;
@@ -622,13 +627,13 @@ namespace ffmpeg_qualityCompare
 
 
             }
-            
-                return resultStr;
+
+            return resultStr;
         }
 
-            static void Main(string[] args)
+        static void Main(string[] args)
         {
-            if(args.Length != 0) 
+            if (args.Length != 0)
             {
                 if (args[0] == "avg")
                 {
@@ -638,7 +643,7 @@ namespace ffmpeg_qualityCompare
                 }
             }
 
-            
+
             else if (args.Length == 0)
             {
                 Console.WriteLine("Syntax can also be ffmpeg-qualityCompare avg, for creating the average after compare is done");
@@ -696,7 +701,7 @@ namespace ffmpeg_qualityCompare
                 p.StartInfo.FileName = compareBatFilename;
                 p.Start();
                 p.WaitForExit();
-                
+
 
 
                 // wait for the processing to stop before moving forward
@@ -704,7 +709,7 @@ namespace ffmpeg_qualityCompare
             }
             else
             {
-               
+
             }
 
             Console.WriteLine("Want to calculate the average scores? Y/N with enter");
