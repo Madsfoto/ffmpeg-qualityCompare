@@ -93,19 +93,19 @@ namespace ffmpeg_qualityCompare
 
             if (everyFile == true)
             {
-                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mov"))
+                foreach (var COMPAREFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mov"))
                 {
-                    ffmpegBatList.AddRange(CreateBatContentList(modifiedFileFromDir, referenceFile));
+                    ffmpegBatList.AddRange(CreateBatContentList(COMPAREFileFromDir, referenceFile));
 
                 }
-                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mp4"))
+                foreach (var COMPAREFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mp4"))
                 {
-                    ffmpegBatList.AddRange(CreateBatContentList(modifiedFileFromDir, referenceFile));
+                    ffmpegBatList.AddRange(CreateBatContentList(COMPAREFileFromDir, referenceFile));
 
                 }
-                foreach (var modifiedFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mkv"))
+                foreach (var COMPAREFileFromDir in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.mkv"))
                 {
-                    ffmpegBatList.AddRange(CreateBatContentList(modifiedFileFromDir, referenceFile));
+                    ffmpegBatList.AddRange(CreateBatContentList(COMPAREFileFromDir, referenceFile));
 
                 }
             }
@@ -654,7 +654,7 @@ namespace ffmpeg_qualityCompare
                 string referenceFileCMD = Console.ReadLine();
                 if (referenceFileCMD.Length == 0)
                 {
-                    Filegen("MODIFIED", "REFERENCE", false);
+                    Filegen("COMPARE", "REFERENCE", false);
                 }
                 if (referenceFileCMD.Length < 4)
                 {
@@ -670,21 +670,21 @@ namespace ffmpeg_qualityCompare
                     }
                     else
                     {
-                        Console.WriteLine("Write MODIFIED filename");
-                        String modifiedFileCMD = Console.ReadLine();
-                        if (modifiedFileCMD.Length == 0)
+                        Console.WriteLine("Write COMPARE filename");
+                        String compareFileCMD = Console.ReadLine();
+                        if (compareFileCMD.Length == 0)
                         {
-                            Console.WriteLine("MODIFIED can not be empty");
+                            Console.WriteLine("COMPARE can not be empty");
                             return;
                         }
-                        else if (modifiedFileCMD.Length < 4)
+                        else if (compareFileCMD.Length < 4)
                         {
-                            Console.WriteLine("MODIFIED must have a full extension, eg .mov");
+                            Console.WriteLine("COMPARE must have a full extension, eg .mov");
                             return;
                         }
                         else
                         {
-                            Filegen(modifiedFileCMD, referenceFileCMD, false);
+                            Filegen(compareFileCMD, referenceFileCMD, false);
                         }
 
                     }
