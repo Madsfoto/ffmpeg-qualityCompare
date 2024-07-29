@@ -556,11 +556,10 @@ namespace ffmpeg_qualityCompare
                 //[Parsed_psnr_0 @ 0000020e66888480] PSNR y:32.858832 u:43.313200 v:41.155595 average:36.702531 min:36.102411 max:37.343557
                 //[Parsed_psnr_0 @ 000001aa9aebef00] PSNR y:33.029119 u:44.250376 v:42.139314 average:37.014945 min:36.360319 max:37.750726
                 {
-                    // for 8 bit, the max PSNR is 48,164799 (20*log10(256).
-                    // for 10 bit, the max PSNR is 60,205999 (20*log10(1024).
+                    // for 8 bit, the max PSNR is 48,164799 (20*log10(256)).
+                    // for 10 bit, the max PSNR is 60,205999 (20*log10(1024)).
 
-                    // TODO FIXME: One division for 8 and one for 10 bit
-                    // meaning that any value is divided by 0.6 to get a normalized value in the 0-100 range. 
+                    
                     string ParseResult = line.Substring(line.IndexOf("average:") + 8, 9);
 
                     ParseResult = ParseResult.Replace(".", ",");
