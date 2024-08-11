@@ -174,6 +174,8 @@ namespace ffmpeg_qualityCompare
                 double actualAvg = average / numberOfTxt;
 
                 sw.WriteLine("Average of all the algorithms: " + actualAvg.ToString());
+                sw.WriteLine("Total average combined "+average);
+                sw.WriteLine("Total lines combined " + numberOfTxt);
                 sw.WriteLine();
                 foreach (var line in Filenames_and_quality)
                 {
@@ -188,7 +190,7 @@ namespace ffmpeg_qualityCompare
             }
 
         }
-        static void WriteResult()
+        static void WriteResultAndAverages()
         {
             int numberOfTxt = 0;
             double testfileResultDouble = 0;
@@ -225,8 +227,19 @@ namespace ffmpeg_qualityCompare
                         resultStr = ReadResultLine(line, FileNameNoExt, GetBitDepth());
                         if (resultStr.Length > 0)
                         {
+                            
+                            
+                            if (resultStr.Contains("Filesize")) 
+                            {
+                                resultStr = resultStr.Replace("Filesize;", "");
+                            }
+                            else
+                            {
+                                numberOfTxt++;
+                            }
                             Filenames_and_quality.Add(resultStr);
-                            numberOfTxt++;
+
+                            //Console.WriteLine(resultStr);
                             if (line.Contains("VIF scale="))
                             {
                                 string actualfilename = FileNameNoExt.Substring(0, FileNameNoExt.Length - 4); ; // TODO: needs to be changed to the actual thing
@@ -637,6 +650,7 @@ namespace ffmpeg_qualityCompare
                 double vifScaleDouble = double.Parse(line.Substring(54).Substring(0, 8)) / 10000d; ;
 
                 // 17+9+5+3 = 34. So actually the final score is (VIF scale=0) /(17/34)+(VIF scale=1)/(9/34)+(VIF scale=2)/(5/34)+(VIF scale=3)/(3/34).
+                // source: "static const uint8_t vif_filter1d_width1[4] = { 17, 9, 5, 3 };" from https://ffmpeg.org/doxygen/4.4/vf__vif_8c_source.html line 67
                 if (line.Contains("VIF scale=0"))
                 {
 
@@ -676,7 +690,8 @@ namespace ffmpeg_qualityCompare
             {
                 // line is
                 // Filesize;QP18_422p10le;267238961
-                string result = line.Substring(line.IndexOf(";")+1);
+                // string result = line.Substring(line.IndexOf(";")+1);
+                string result = line;
                 // result should be QP18_422p10le;267238961  which is what we want
                 resultStr= result;
 
@@ -692,7 +707,7 @@ namespace ffmpeg_qualityCompare
                 // Write the average of the results, as in the last function here
                 if (args[0] == "avg")
                 {
-                    WriteResult();
+                    WriteResultAndAverages();
                     return;
                 }
                 if (args[0] == "size")
@@ -781,7 +796,7 @@ namespace ffmpeg_qualityCompare
             Console.WriteLine("Want to calculate the average scores? Y/N with enter");
             if (Console.ReadLine() == "y")
             {
-                WriteResult();
+                WriteResultAndAverages();
             }
 
             else
