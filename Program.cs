@@ -174,7 +174,6 @@ namespace ffmpeg_qualityCompare
                 double actualAvg = average / numberOfTxt;
 
                 sw.WriteLine("Average of all the algorithms: " + actualAvg.ToString());
-                sw.WriteLine("Total average combined "+average);
                 sw.WriteLine("Total lines combined " + numberOfTxt);
                 sw.WriteLine();
                 foreach (var line in Filenames_and_quality)
