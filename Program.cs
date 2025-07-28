@@ -173,7 +173,7 @@ namespace ffmpeg_qualityCompare
                 StreamWriter sw = new StreamWriter("Algo_qual.txt");
                 double actualAvg = average / numberOfTxt;
 
-                sw.WriteLine("Average of all the algorithms: " + actualAvg.ToString());
+                sw.WriteLine("Average of all the algorithms; " + actualAvg.ToString());
                 sw.WriteLine("Total lines combined " + numberOfTxt);
                 sw.WriteLine();
                 foreach (var line in Filenames_and_quality)
@@ -230,7 +230,7 @@ namespace ffmpeg_qualityCompare
                             
                             if (resultStr.Contains("Filesize")) 
                             {
-                                resultStr = resultStr.Replace("Filesize;", "");
+                                resultStr = resultStr.Replace("Filesize;;", "");
                             }
                             else
                             {
