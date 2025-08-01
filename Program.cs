@@ -12,6 +12,7 @@ namespace ffmpeg_qualityCompare
         static double vifScore = 0;
         static double fileAverage = 0;
         static int bitdepth = 8;
+        static string filesize = "";
         static List<string> Filenames_and_quality = new List<string>(); // the list where every piece of information is stored. TODO: rename to Filenames_Size_and_Quality
 
 
@@ -127,7 +128,7 @@ namespace ffmpeg_qualityCompare
             //ffmpeg -i main.mpg -i ref.mpg -lavfi psnr -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi identity -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi vif -f null -
-            //ffmpeg -i main.mpg -i ref.mpg -lavfi libvmaf -f null - // not used as unreliable
+            //ffmpeg -i main.mpg -i ref.mpg -lavfi libvmaf -f null - // not used as it is unreliable: Comparing identical videos gives a score of 98.9, which is too low.
             //ffmpeg -i main.mpg -i ref.mpg -lavfi msad -f null -
             //ffmpeg -i main.mpg -i ref.mpg -lavfi corr -f null -
 
@@ -174,7 +175,7 @@ namespace ffmpeg_qualityCompare
                 double actualAvg = average / numberOfTxt;
 
                 sw.WriteLine("Average of all the algorithms; " + actualAvg.ToString());
-                sw.WriteLine("Total lines combined " + numberOfTxt);
+                //sw.WriteLine("Total lines combined " + numberOfTxt);
                 sw.WriteLine();
                 foreach (var line in Filenames_and_quality)
                 {
@@ -194,6 +195,10 @@ namespace ffmpeg_qualityCompare
             int numberOfTxt = 0;
             double testfileResultDouble = 0;
             string resultStr = "";
+            if(File.Exists("Algo_qual.txt"))
+            {
+                File.Delete("Algo_qual.txt");
+            }  
 
             foreach (var file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.txt"))
             {
@@ -225,12 +230,15 @@ namespace ffmpeg_qualityCompare
                     {
                         resultStr = ReadResultLine(line, FileNameNoExt, GetBitDepth());
                         if (resultStr.Length > 0)
-                        {
-                            
-                            
+                        {   
                             if (resultStr.Contains("Filesize")) 
                             {
                                 resultStr = resultStr.Replace("Filesize;;", "");
+
+                                // Filesize;libx265_crf_0;755153400
+                                // I only care about the last part, the filesize.
+                                filesize = resultStr.Substring(resultStr.LastIndexOf(";") + 1);
+                                 
                             }
                             else
                             {
@@ -244,13 +252,14 @@ namespace ffmpeg_qualityCompare
                                 string actualfilename = FileNameNoExt.Substring(0, FileNameNoExt.Length - 4); ; // TODO: needs to be changed to the actual thing
 
 
-                                testfileResultDouble = fileAverage / 5; // TODO: Actual number of test file results.
+                                testfileResultDouble = fileAverage / 5; 
 
                                 Filenames_and_quality.Add(""); // empty line
-                                Filenames_and_quality.Add(actualfilename + " average: " + testfileResultDouble + " ");
+                                Filenames_and_quality.Add(actualfilename + " size quality; " + filesize +";"+ testfileResultDouble);
 
                                 Filenames_and_quality.Add(""); // empty line
                                 fileAverage = 0;
+                                filesize = "";
 
                             }
                         }
