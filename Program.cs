@@ -167,16 +167,32 @@ namespace ffmpeg_qualityCompare
 
 
         //static void WriteResultFile(int numberOfTxt, List<string> Filenames_and_quality)
-        static void WriteResultFile(int numberOfTxt)
+        static void WriteResultFile(int numberOfTxt, bool isShort)
         {
+            string algoname = "";
+            // 
+           
+
             try
             {
-                StreamWriter sw = new StreamWriter("Algo_qual.txt");
+                if(isShort==false)
+                {
+                    algoname = "Algo_qual.txt";
+                }
+                else // isShort == true
+                {
+                    algoname = "Algo_qual_short.txt";
+                }
+                if (File.Exists(algoname))
+                {
+                    File.Delete(algoname);
+                }
+                StreamWriter sw = new StreamWriter(algoname);
                 double actualAvg = average / numberOfTxt;
 
-                sw.WriteLine("Average of all the algorithms; " + actualAvg.ToString());
+                //sw.WriteLine("Average of all the algorithms; " + actualAvg.ToString());
                 //sw.WriteLine("Total lines combined " + numberOfTxt);
-                sw.WriteLine();
+                //sw.WriteLine();
                 foreach (var line in Filenames_and_quality)
                 {
                     sw.WriteLine(line);
@@ -190,15 +206,12 @@ namespace ffmpeg_qualityCompare
             }
 
         }
-        static void WriteResultAndAverages()
+        static void WriteResultAndAverages(bool isShort)
         {
             int numberOfTxt = 0;
             double testfileResultDouble = 0;
             string resultStr = "";
-            if(File.Exists("Algo_qual.txt"))
-            {
-                File.Delete("Algo_qual.txt");
-            }  
+          
 
             foreach (var file in Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.txt"))
             {
@@ -220,57 +233,70 @@ namespace ffmpeg_qualityCompare
                 // write results to list
                 foreach (var line in lines)
                 {
-                    //if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
-                    //  || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
-                    if (line.Contains("Parsed_corr") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0") || line.Contains("Parsed_ssim_0")
-                        || line.Contains("VIF scale=")||line.Contains("Filesize;")) 
-                        
+                    
+
+                        //if (line.Contains("VMAF score") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0")
+                        //  || line.Contains("Parsed_ssim_0") || line.Contains("VIF scale=")||line.Contains("Parsed_corr") ||line.Contains("Parsed_identity"))
+                        if (line.Contains("Parsed_corr") || line.Contains("Parsed_msad_0") || line.Contains("Parsed_psnr_0") || line.Contains("Parsed_ssim_0")
+                            || line.Contains("VIF scale=") || line.Contains("Filesize;"))
+
                         // REMEMBER TO CHANGE THE LIST IN ReadResultLine()
 
-                    {
-                        resultStr = ReadResultLine(line, FileNameNoExt, GetBitDepth());
-                        if (resultStr.Length > 0)
-                        {   
-                            if (resultStr.Contains("Filesize")) 
+                        {
+                            resultStr = ReadResultLine(line, FileNameNoExt, GetBitDepth());
+                            if (resultStr.Length > 0)
                             {
-                                resultStr = resultStr.Replace("Filesize;;", "");
+                                if (resultStr.Contains("Filesize"))
+                                {
+                                    resultStr = resultStr.Replace("Filesize;;", "");
 
-                                // Filesize;libx265_crf_0;755153400
-                                // I only care about the last part, the filesize.
-                                filesize = resultStr.Substring(resultStr.LastIndexOf(";") + 1);
-                                 
-                            }
-                            else
+                                    // Filesize;libx265_crf_0;755153400
+                                    // I only care about the last part, the filesize.
+                                    filesize = resultStr.Substring(resultStr.LastIndexOf(";") + 1);
+
+                                }
+                                else
+                                {
+                                    numberOfTxt++;
+                                }
+                                if(isShort==false)
                             {
-                                numberOfTxt++;
+                                Filenames_and_quality.Add(resultStr);
                             }
-                            Filenames_and_quality.Add(resultStr);
+                                
 
-                            //Console.WriteLine(resultStr);
-                            if (line.Contains("VIF scale="))
-                            {
-                                string actualfilename = FileNameNoExt.Substring(0, FileNameNoExt.Length - 4); ; // TODO: needs to be changed to the actual thing
+                                //Console.WriteLine(resultStr);
+                                if (line.Contains("VIF scale="))
+                                {
+                                    string actualfilename = FileNameNoExt.Substring(0, FileNameNoExt.Length - 4); ; // TODO: needs to be changed to the actual thing
 
 
-                                testfileResultDouble = fileAverage / 5; 
+                                    testfileResultDouble = fileAverage / 5;
+                                if (isShort == false)
+                                {
+                                    Filenames_and_quality.Add(""); // empty line
+                                    Filenames_and_quality.Add(actualfilename + " size quality; " + filesize + ";" + testfileResultDouble);
 
-                                Filenames_and_quality.Add(""); // empty line
-                                Filenames_and_quality.Add(actualfilename + " size quality; " + filesize +";"+ testfileResultDouble);
+                                    Filenames_and_quality.Add(""); // empty line
+                                }
+                                if (isShort == true)
+                                {
+                                    Filenames_and_quality.Add(actualfilename + " size quality; " + filesize + ";" + testfileResultDouble);
+                                }
 
-                                Filenames_and_quality.Add(""); // empty line
-                                fileAverage = 0;
-                                filesize = "";
+                                    fileAverage = 0;
+                                    filesize = "";
 
+                                }
                             }
+
+
                         }
-
-
-                    }
-
+                    
                 }
             }
 
-            WriteResultFile(numberOfTxt);
+            WriteResultFile(numberOfTxt, isShort);
 
 
 
@@ -715,7 +741,7 @@ namespace ffmpeg_qualityCompare
                 // Write the average of the results, as in the last function here
                 if (args[0] == "avg")
                 {
-                    WriteResultAndAverages();
+                    WriteResultAndAverages(false);
                     return;
                 }
                 if (args[0] == "size")
@@ -724,6 +750,11 @@ namespace ffmpeg_qualityCompare
                     // write txt file with the source filename+.txt
                     // content: Filesize;Filename;SIZE
                     filesizeGen();
+                }
+                if (args[0] == "short")
+                {
+                    WriteResultAndAverages(true);
+                    return;
                 }
 
 
@@ -804,7 +835,7 @@ namespace ffmpeg_qualityCompare
             Console.WriteLine("Want to calculate the average scores? Y/N with enter");
             if (Console.ReadLine() == "y")
             {
-                WriteResultAndAverages();
+                WriteResultAndAverages(false);
             }
 
             else
